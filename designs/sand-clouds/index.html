@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#F7F7F4">
+    <meta name="description" content="Slow WebGL smoke rolling over a sand gradient.">
+    <title>Sand clouds — Deep Dave</title>
+    <link rel="icon" href="data:,">
+    <link rel="preload" href="./assets/ellipse-gradient.avif" as="image">
+    <link rel="stylesheet" href="./styles.css">
+    <script type="module" src="./main.js"></script>
+  </head>
+  <body>
+    <h1 class="sr-only">Sand clouds</h1>
+    <section class="stage" aria-hidden="true">
+      <div class="layers">
+        <img class="dune" src="./assets/ellipse-gradient.avif" width="1920" height="859" alt="">
+        <canvas class="smoke" data-headline-fog="smoke" data-fog-origin="180.9,-386" data-fog-scale="0.8116"></canvas>
+      </div>
+    </section>
+    <nav class="toolbar" aria-label="Design controls">
+      <a href="../../">← Designs</a>
+      <button type="button" id="motion" hidden>Pause</button>
+    </nav>
+  </body>
+</html>
