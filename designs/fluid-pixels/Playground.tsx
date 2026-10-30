@@ -83,7 +83,7 @@ export function Playground() {
             <div><dt>Square</dt><dd>4px</dd></div>
             <div><dt>Gap</dt><dd>1.5px</dd></div>
             <div><dt>Background</dt><dd>#141208</dd></div>
-            <div><dt>Squares / accent</dt><dd>#201E18</dd></div>
+            <div><dt>Squares / accent</dt><dd>#1B1913</dd></div>
           </dl>
           <p className="implementation">One plane. One shader pass.<br />Noise sampled at each cell’s center.</p>
         </aside>

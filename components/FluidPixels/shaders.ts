@@ -19,7 +19,7 @@ export const fragmentShader = /* glsl */ `
   uniform float uJitter;
 
   const vec3 BACKGROUND = vec3(20.0, 18.0, 8.0) / 255.0;
-  const vec3 SQUARE = vec3(32.0, 30.0, 24.0) / 255.0;
+  const vec3 SQUARE = vec3(27.0, 25.0, 19.0) / 255.0;
   const float SQUARE_SIZE = 4.0;
   const float CELL_SIZE = 5.5;
   const float FIELD_UNIT = 256.0;

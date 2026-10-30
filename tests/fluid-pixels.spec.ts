@@ -36,7 +36,7 @@ async function frame(page: Page) {
         const px = (x + 0.5) / sx, py = bounds.height - (y + 0.5) / sy;
         const cx = Math.floor(px / 5.5), cy = Math.floor(py / 5.5);
         const lx = px - cx * 5.5, ly = py - cy * 5.5;
-        const visible = color === '32,30,24,255';
+        const visible = color === '27,25,19,255';
         if (visible) {
           foregroundPixels++;
           if (lx > 4.001 || ly > 4.001) invalidGridPixels++;
@@ -68,7 +68,7 @@ test('exact two-color palette, whole fixed cells, one draw call, and matching CS
     await expect(host).toHaveAttribute('data-state', 'paused');
     await expect(host).toHaveAttribute('data-draw-calls', '1');
     const result = await frame(page);
-    expect(result.palette).toEqual(['20,18,8,255', '32,30,24,255']);
+    expect(result.palette).toEqual(['20,18,8,255', '27,25,19,255']);
     expect(result.invalidGridPixels).toBe(0);
     expect(result.partialCells).toBe(0);
     expect(result.fraction).toBeGreaterThan(0.02);
