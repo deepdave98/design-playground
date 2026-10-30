@@ -1,4 +1,4 @@
-# Designs
+# Design playground
 
 Web design and motion by Deep Dave.
 
