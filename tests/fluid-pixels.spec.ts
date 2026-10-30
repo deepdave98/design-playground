@@ -92,17 +92,17 @@ test('the formations evolve while every square stays on the grid', async ({ page
   expect(second.partialCells).toBe(0);
 });
 
-test('pause and tab visibility stop GPU draws; hero links remain clickable', async ({ page }) => {
+test('reduced motion and tab visibility stop GPU draws; content can sit above the background', async ({ page }) => {
   await instrument(page);
   await page.goto('/designs/fluid-pixels/');
   const host = page.locator('[data-fluid-pixels]');
   await expect(host).toHaveAttribute('data-state', 'running');
-  await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(host).toHaveAttribute('data-state', 'paused');
   const paused = await page.evaluate(() => (window as any).__draws);
   await page.waitForTimeout(150);
   expect(await page.evaluate(() => (window as any).__draws)).toBe(paused);
-  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await expect(host).toHaveAttribute('data-state', 'running');
   await page.evaluate(() => {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
@@ -117,8 +117,14 @@ test('pause and tab visibility stop GPU draws; hero links remain clickable', asy
     document.dispatchEvent(new Event('visibilitychange'));
   });
   await expect(host).toHaveAttribute('data-state', 'running');
-  await page.getByRole('checkbox', { name: 'Hero content' }).check();
-  await page.getByRole('link', { name: 'Click through' }).click();
+  await page.evaluate(() => {
+    const link = document.createElement('a');
+    link.href = '#clicked';
+    link.textContent = 'Test link';
+    link.style.cssText = 'position:fixed;left:20px;top:20px;z-index:1';
+    document.body.append(link);
+  });
+  await page.getByRole('link', { name: 'Test link' }).click();
   await expect(page).toHaveURL(/#clicked$/);
 });
 
@@ -136,17 +142,17 @@ test('solid background without WebGL', async ({ page }) => {
   await expect(host.locator('canvas')).toHaveCount(0);
 });
 
-test('mobile preview, default parameters, and captures', async ({ page }) => {
+test('the page contains only the full viewport background on desktop and phone', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/designs/fluid-pixels/');
-  await expect(page.getByRole('slider', { name: /Noise density/ })).toHaveValue('0.8');
-  await expect(page.getByRole('slider', { name: /Animation speed/ })).toHaveValue('0.26');
-  await expect(page.getByRole('slider', { name: /Domain warp/ })).toHaveValue('2.2');
-  await expect(page.getByRole('slider', { name: /Visibility threshold/ })).toHaveValue('0.66');
-  await expect(page.getByRole('slider', { name: /Cell threshold jitter/ })).toHaveValue('0.18');
+  await expect(page.locator('button, input, a, header, aside')).toHaveCount(0);
+  await expect(page.locator('body')).toHaveText('');
+  await expect(page.locator('[data-fluid-pixels]')).toHaveAttribute('data-state', 'paused');
+  expect(await page.locator('[data-fluid-pixels]').boundingBox()).toEqual({ x: 0, y: 0, width: 1280, height: 900 });
   await page.screenshot({ path: '.context/fluid-pixels-playground.png', fullPage: true });
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  expect(await page.locator('[data-fluid-pixels]').boundingBox()).toEqual({ x: 0, y: 0, width: 390, height: 844 });
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth === innerWidth && document.documentElement.scrollHeight === innerHeight)).toBe(true);
   await expect(page.locator('[data-fluid-pixels]')).toHaveAttribute('data-state', 'paused');
   await page.screenshot({ path: '.context/fluid-pixels-mobile.png', fullPage: true });
   await page.setViewportSize({ width: 1280, height: 720 });
