@@ -17,7 +17,7 @@ import {
 import { fragmentShader, vertexShader } from './shaders';
 
 export const FLUID_PIXEL_COLORS = {
-  background: '#141208',
+  background: '#100E06',
   foreground: '#1B1913',
   accent: '#1B1913',
   hoverPalette: ['#1B1913', '#1B1913', '#1B1913', '#1B1913'],

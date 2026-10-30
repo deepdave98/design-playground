@@ -68,7 +68,7 @@ test('exact two-color palette, whole fixed cells, one draw call, and matching CS
     await expect(host).toHaveAttribute('data-state', 'paused');
     await expect(host).toHaveAttribute('data-draw-calls', '1');
     const result = await frame(page);
-    expect(result.palette).toEqual(['20,18,8,255', '27,25,19,255']);
+    expect(result.palette).toEqual(['16,14,6,255', '27,25,19,255']);
     expect(result.invalidGridPixels).toBe(0);
     expect(result.partialCells).toBe(0);
     expect(result.fraction).toBeGreaterThan(0.02);
@@ -132,7 +132,7 @@ test('solid background without WebGL', async ({ page }) => {
   await page.goto('/designs/fluid-pixels/?embed');
   const host = page.locator('[data-fluid-pixels]');
   await expect(host).toHaveAttribute('data-state', 'fallback');
-  await expect(host).toHaveCSS('background-color', 'rgb(20, 18, 8)');
+  await expect(host).toHaveCSS('background-color', 'rgb(16, 14, 6)');
   await expect(host.locator('canvas')).toHaveCount(0);
 });
 
