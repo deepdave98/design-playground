@@ -1,4 +1,4 @@
-import { FluidPixels } from '../../components/FluidPixels';
+import { FluidPixels } from './FluidPixels';
 
 export function Playground() {
   return (

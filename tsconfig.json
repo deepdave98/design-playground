@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true
   },
-  "include": ["components", "designs/**/*.tsx", "designs/**/*.ts"]
+  "include": ["designs/*/src/**/*"]
 }

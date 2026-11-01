@@ -6,4 +6,6 @@ Web design and motion by Deep Dave.
 
 `npm install` → `npm run dev`
 
-Designs in `designs/`. Reusable React components in `components/`. `npm run build` produces `dist/` for Vercel.
+Each folder in `designs/` contains its source, preview, assets, and usage notes. Tests live beside the design they cover.
+
+`npm test` · `npm run build` → `dist/` for Vercel.
