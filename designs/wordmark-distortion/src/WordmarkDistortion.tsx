@@ -28,11 +28,14 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
     const fallbackImage = imageRef.current!;
     const canvas = document.createElement('canvas');
     const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    function setState(state: string) {
+      if (host.dataset.state !== state) host.dataset.state = state;
+    }
     let renderer: WebGLRenderer;
     try {
       renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
     } catch {
-      host.dataset.state = 'fallback';
+      setState('fallback');
       return;
     }
     renderer.outputColorSpace = SRGBColorSpace;
@@ -40,7 +43,7 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
     Object.assign(canvas.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', pointerEvents: 'none', visibility: 'hidden' });
     host.append(canvas);
     fallbackImage.style.visibility = 'visible';
-    host.dataset.state = 'loading';
+    setState('loading');
 
     const field = new DisplacementField();
     const displacement = new DataTexture(field.data, field.size, field.size, RGBAFormat, FloatType);
@@ -83,15 +86,16 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
       stop();
       canvas.style.visibility = 'hidden';
       fallbackImage.style.visibility = 'visible';
-      host.dataset.state = 'fallback';
+      setState('fallback');
     }
     renderer.debug.onShaderError = fallback;
 
     function render() {
       if (!uniforms.uLogo.value || failed || contextLost) return;
       renderer.render(scene, camera);
-      host.dataset.drawCalls = String(renderer.info.render.calls);
-      if (!failed) {
+      const calls = String(renderer.info.render.calls);
+      if (host.dataset.drawCalls !== calls) host.dataset.drawCalls = calls;
+      if (!failed && canvas.style.visibility !== 'visible') {
         canvas.style.visibility = 'visible';
         fallbackImage.style.visibility = 'hidden';
       }
@@ -108,7 +112,7 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
       }
       render();
       if (failed || contextLost) return;
-      host.dataset.state = moving ? 'active' : animateBackground ? 'running' : 'idle';
+      setState(moving ? 'active' : animateBackground ? 'running' : 'idle');
       if (moving || animateBackground) frame = requestAnimationFrame(tick);
       else previousTime = null;
     }
@@ -122,7 +126,7 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
       previousPointer = undefined;
       if (failed || contextLost || !uniforms.uLogo.value) return;
       if (document.hidden || !onScreen) {
-        host.dataset.state = document.hidden ? 'hidden' : 'offscreen';
+        setState(document.hidden ? 'hidden' : 'offscreen');
         return;
       }
       if (reducedMotion.matches) {
@@ -132,7 +136,7 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
       }
       render();
       if (failed) return;
-      host.dataset.state = reducedMotion.matches ? 'paused' : moving ? 'active' : animateBackground ? 'running' : 'idle';
+      setState(reducedMotion.matches ? 'paused' : moving ? 'active' : animateBackground ? 'running' : 'idle');
       if (moving || animateBackground) requestRender();
     }
 
@@ -176,7 +180,7 @@ export function WordmarkDistortion({ src, alt, aspect, animateBackground = true,
       stop();
       canvas.style.visibility = 'hidden';
       fallbackImage.style.visibility = 'visible';
-      host.dataset.state = 'fallback';
+      setState('fallback');
     }
     function restored() {
       contextLost = false;
