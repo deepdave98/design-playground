@@ -2,7 +2,7 @@
 
 Web design and motion by Deep Dave.
 
-[Sand clouds](designs/sand-clouds/) · [Fluid pixels](designs/fluid-pixels/)
+[Sand clouds](designs/sand-clouds/) · [Fluid pixels](designs/fluid-pixels/) · [Wordmark distortion](designs/wordmark-distortion/)
 
 `npm install` → `npm run dev`
 

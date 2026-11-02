@@ -198,3 +198,16 @@ test('phone touch distorts the logo without blocking vertical scrolling', async 
   await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(0);
   await context.close();
 });
+
+test('the gallery preview loads and opens the wordmark demo', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.goto('/');
+  const link = page.getByRole('link', { name: /Wordmark distortion/ });
+  await expect(link).toBeVisible();
+  expect(await link.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth === 1280)).toBe(true);
+  await link.click();
+  await expect(page).toHaveURL(/\/designs\/wordmark-distortion\/$/);
+  await expect(page.locator('[data-wordmark-distortion]')).toHaveAttribute('data-state', 'running');
+  expect(errors).toEqual([]);
+});
