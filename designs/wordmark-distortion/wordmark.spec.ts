@@ -30,7 +30,7 @@ async function frameHash(page: Page) {
 test('the wordmark deforms under the pointer and returns to the exact original frame', async ({ page }) => {
   await instrument(page);
   await page.goto('/designs/wordmark-distortion/?still');
-  const host = page.getByRole('img', { name: 'Orbit', exact: true });
+  const host = page.getByRole('img', { name: 'Cursor', exact: true });
   await expect(host).toHaveAttribute('data-state', 'idle');
   await expect(host.locator('canvas')).toHaveCount(1);
   await expect(host).toHaveAttribute('data-draw-calls', '1');
@@ -65,7 +65,7 @@ test('the original SVG stays visible when WebGL is unavailable', async ({ page }
     } as typeof getContext;
   });
   await page.goto('/designs/wordmark-distortion/');
-  const host = page.getByRole('img', { name: 'Orbit', exact: true });
+  const host = page.getByRole('img', { name: 'Cursor', exact: true });
   await expect(host).toHaveAttribute('data-state', 'fallback');
   await expect(host.locator('canvas')).toHaveCount(0);
   await expect(host.locator('img')).toBeVisible();

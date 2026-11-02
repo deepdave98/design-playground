@@ -14,4 +14,4 @@ Mouse and touch use the same displacement field. Reduced motion keeps the logo s
 
 The background is a fixed grid of 3px squares with 1.75px gaps. Three-octave simplex noise and domain warping control visibility. The grid and displaced logo share one plane and one draw call.
 
-`animateBackground={false}` freezes the pixel field while keeping pointer interaction. The demo accepts `?still` for this mode. `assets/orbit.svg` is an original example wordmark; replace it with any transparent logo.
+`animateBackground={false}` freezes the pixel field while keeping pointer interaction. The demo accepts `?still` for this mode. `assets/cursor.svg` uses the official wordmark from [Cursor's brand assets](https://cursor.com/brand), with the demo's low contrast treatment. Replace it with any transparent logo.
