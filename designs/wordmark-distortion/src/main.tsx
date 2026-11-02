@@ -7,7 +7,13 @@ import './styles.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <main className="page">
-      <WordmarkDistortion src={orbit} alt="Orbit" aspect={4} className="wordmark-band" />
+      <WordmarkDistortion
+        src={orbit}
+        alt="Orbit"
+        aspect={4}
+        animateBackground={!new URLSearchParams(location.search).has('still')}
+        className="wordmark-band"
+      />
     </main>
   </StrictMode>,
 );

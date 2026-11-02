@@ -3,9 +3,9 @@
 import { useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import {
-  CanvasTexture, DataTexture, FloatType, LinearFilter, Mesh, NearestFilter,
-  NoToneMapping, OrthographicCamera, PlaneGeometry, RGBAFormat, Scene,
-  ShaderMaterial, SRGBColorSpace, Vector4, WebGLRenderer,
+  CanvasTexture, Color, DataTexture, FloatType, LinearFilter, Mesh, NearestFilter,
+  NoBlending, NoToneMapping, OrthographicCamera, PlaneGeometry, RGBAFormat, Scene,
+  ShaderMaterial, SRGBColorSpace, Vector2, Vector4, WebGLRenderer,
 } from 'three';
 import { DisplacementField } from './displacement';
 import { fragmentShader, vertexShader } from './shaders';
@@ -14,11 +14,12 @@ export type WordmarkDistortionProps = {
   src: string;
   alt: string;
   aspect: number;
+  animateBackground?: boolean;
   className?: string;
   style?: CSSProperties;
 };
 
-export function WordmarkDistortion({ src, alt, aspect, className, style }: WordmarkDistortionProps) {
+export function WordmarkDistortion({ src, alt, aspect, animateBackground = true, className, style }: WordmarkDistortionProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
 
@@ -49,8 +50,12 @@ export function WordmarkDistortion({ src, alt, aspect, className, style }: Wordm
       uLogo: { value: null as CanvasTexture | null },
       uDisplacement: { value: displacement },
       uLogoRect: { value: new Vector4() },
+      uResolution: { value: new Vector2() },
+      uTime: { value: 0 },
+      uForeground: { value: new Color('#4f4f4f') },
+      uAccent: { value: new Color('#7e7572') },
     };
-    const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, transparent: true, depthTest: false, depthWrite: false, toneMapped: false });
+    const material = new ShaderMaterial({ uniforms, vertexShader, fragmentShader, blending: NoBlending, depthTest: false, depthWrite: false, toneMapped: false });
     const geometry = new PlaneGeometry(2, 2);
     const scene = new Scene();
     const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
@@ -96,11 +101,15 @@ export function WordmarkDistortion({ src, alt, aspect, className, style }: Wordm
       frame = 0;
       const seconds = previousTime === null ? 1 / 60 : Math.min((now - previousTime) / 1000, 0.05);
       previousTime = now;
-      moving = field.step(seconds);
-      displacement.needsUpdate = true;
+      if (animateBackground) uniforms.uTime.value += seconds;
+      if (moving) {
+        moving = field.step(seconds);
+        displacement.needsUpdate = true;
+      }
       render();
-      host.dataset.state = moving ? 'active' : 'idle';
-      if (moving && !failed && !contextLost) frame = requestAnimationFrame(tick);
+      if (failed || contextLost) return;
+      host.dataset.state = moving ? 'active' : animateBackground ? 'running' : 'idle';
+      if (moving || animateBackground) frame = requestAnimationFrame(tick);
       else previousTime = null;
     }
 
@@ -122,8 +131,9 @@ export function WordmarkDistortion({ src, alt, aspect, className, style }: Wordm
         displacement.needsUpdate = true;
       }
       render();
-      host.dataset.state = reducedMotion.matches ? 'paused' : moving ? 'active' : 'idle';
-      if (moving) requestRender();
+      if (failed) return;
+      host.dataset.state = reducedMotion.matches ? 'paused' : moving ? 'active' : animateBackground ? 'running' : 'idle';
+      if (moving || animateBackground) requestRender();
     }
 
     function resize() {
@@ -131,6 +141,7 @@ export function WordmarkDistortion({ src, alt, aspect, className, style }: Wordm
       if (width <= 0 || height <= 0) return;
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(width, height, false);
+      uniforms.uResolution.value.set(width, height);
       const logoWidth = Math.min(width * 0.8, height * 0.95 * aspect);
       const logoHeight = logoWidth / aspect;
       uniforms.uLogoRect.value.set((1 - logoWidth / width) / 2, (1 - logoHeight / height) / 2, logoWidth / width, logoHeight / height);
@@ -242,10 +253,17 @@ export function WordmarkDistortion({ src, alt, aspect, className, style }: Wordm
       renderer.forceContextLoss();
       canvas.remove();
     };
-  }, [src, aspect]);
+  }, [src, aspect, animateBackground]);
 
   return (
-    <div ref={hostRef} role="img" aria-label={alt} className={className} data-wordmark-distortion="" style={{ position: 'relative', aspectRatio: String(aspect / 0.8), background: '#000', overflow: 'hidden', ...style }}>
+    <div
+      ref={hostRef}
+      role="img"
+      aria-label={alt}
+      className={className}
+      data-wordmark-distortion=""
+      style={{ position: 'relative', aspectRatio: String(aspect / 0.8), background: '#000', overflow: 'hidden', ...style }}
+    >
       <img ref={imageRef} src={src} alt="" aria-hidden="true" draggable={false} style={{ position: 'absolute', inset: 0, margin: 'auto', width: '80%', height: '95%', objectFit: 'contain', opacity: 0.8, pointerEvents: 'none', userSelect: 'none' }} />
     </div>
   );
